@@ -7,10 +7,10 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+
 import static com.mongodb.client.model.Filters.*;
 
 import java.util.Arrays;
-
 
 
 public class App {
@@ -36,10 +36,17 @@ public class App {
         MongoCollection<Document> coll = database.getCollection("restaurants");
 
         MongoCursor<Document> iterator = coll.find(eq("borough", "Poznań")).iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             String json = iterator.next().toJson();
             System.out.println(json);
         }
+
+        Document document = new Document("borough", "Poznań")
+                .append("cuisine", "Drinks")
+                .append("name", "Polskie Napoje")
+                .append("grades", Arrays.asList(new Document("grade", "A"), new Document("score", 60)));
+
+        coll.insertOne(document);
 
         mongoClient.close();
     }
