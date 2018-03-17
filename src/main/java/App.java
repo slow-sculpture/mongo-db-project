@@ -4,6 +4,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.MongoCredential;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
@@ -28,6 +29,12 @@ public class App {
 
         MongoDatabase database = mongoClient.getDatabase("admin");
         MongoCollection<Document> coll = database.getCollection("restaurants");
+
+        MongoCursor<Document> iterator = coll.find().iterator();
+        while (iterator.hasNext()){
+            String json = iterator.next().toJson();
+            System.out.println(json);
+        }
 
         mongoClient.close();
     }
