@@ -7,9 +7,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-
+import static com.mongodb.client.model.Filters.*;
 
 import java.util.Arrays;
+
+
 
 public class App {
     public static void main(String[] args) {
@@ -23,14 +25,17 @@ public class App {
 
         MongoClientOptions options = MongoClientOptions.builder().sslEnabled(true).build();
 
-        MongoClient mongoClient = new MongoClient(new ServerAddress("cluster0-shard-00-00-eos78.mongodb.net", 27017),
+        MongoClient mongoClient = new MongoClient(Arrays.asList(
+                new ServerAddress("cluster0-shard-00-00-eos78.mongodb.net", 27017),
+                new ServerAddress("cluster0-shard-00-01-eos78.mongodb.net", 27017),
+                new ServerAddress("cluster0-shard-00-02-eos78.mongodb.net", 27017)),
                 Arrays.asList(credential),
                 options);
 
-        MongoDatabase database = mongoClient.getDatabase("admin");
+        MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> coll = database.getCollection("restaurants");
 
-        MongoCursor<Document> iterator = coll.find().iterator();
+        MongoCursor<Document> iterator = coll.find(eq("borough", "Poznań")).iterator();
         while (iterator.hasNext()){
             String json = iterator.next().toJson();
             System.out.println(json);
