@@ -7,8 +7,12 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 
 import static com.mongodb.client.model.Filters.*;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import java.util.Arrays;
 
@@ -21,9 +25,14 @@ public class App {
         String databaseName = "admin";
         char[] password = "sda".toCharArray();
 
+        CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
+                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+
         MongoCredential credential = MongoCredential.createCredential(user, databaseName, password);
 
-        MongoClientOptions options = MongoClientOptions.builder().sslEnabled(true).build();
+        MongoClientOptions options = MongoClientOptions.builder().sslEnabled(true)
+                .codecRegistry(pojoCodecRegistry)
+                .build();
 
         MongoClient mongoClient = new MongoClient(Arrays.asList(
                 new ServerAddress("cluster0-shard-00-00-eos78.mongodb.net", 27017),
@@ -43,7 +52,7 @@ public class App {
 
         Document document = new Document("borough", "Poznań")
                 .append("cuisine", "Drinks")
-                .append("name", "Polskie Napoje")
+                .append("name", "Polish wódkas")
                 .append("grades", Arrays.asList(new Document("grade", "A"), new Document("score", 60)));
 
         coll.insertOne(document);
