@@ -43,11 +43,17 @@ public class App {
 
         MongoDatabase database = mongoClient.getDatabase("test");
         MongoCollection<Document> coll = database.getCollection("restaurants");
+        MongoCollection<Restaurant> coll2 = database.getCollection("restaurants", Restaurant.class);
 
         MongoCursor<Document> iterator = coll.find(eq("borough", "Poznań")).iterator();
         while (iterator.hasNext()) {
             String json = iterator.next().toJson();
             System.out.println(json);
+        }
+        MongoCursor<Restaurant> iterator2 = coll2.find(eq("borough", "Poznań")).iterator();
+        while (iterator2.hasNext()) {
+            Restaurant restaurant = iterator2.next();
+            System.out.println(restaurant.getName());
         }
 
         Document document = new Document("borough", "Poznań")
